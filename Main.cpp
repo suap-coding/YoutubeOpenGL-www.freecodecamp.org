@@ -6,7 +6,7 @@
 #include <GLFW/glfw3.h>	// library we use to create window
 #include "shaders.h"
 
-int notmain()
+int main()
 {
 	glfwInit();
 
@@ -83,11 +83,29 @@ int notmain()
 	
 	// to make sure we use the correct float we go with GLfloat
 	// and we create a triangle as an array of floats
-	GLfloat vertices[] =
+	GLfloat old_vertices[] =
 	{
 		-0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f,
 		 0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f,
 		 0.0f,  0.5f * float(sqrt(3)) * 2 / 3 , 0.0f
+	};
+
+	GLfloat vertices[] =
+	{
+		-0.5f,	-0.5f * float(sqrt(3)) / 3,   0.0f,	// lower left
+		 0.5f,	-0.5f * float(sqrt(3)) / 3,   0.0f,	// lower right
+		 0.0f,   0.5f * float(sqrt(3)) * 2 / 3, 0.0f,	// upper
+		-0.5f / 2, 0.5f * float(sqrt(3)) / 6,   0.0f,	// inner left
+		 0.5f / 2, 0.5f * float(sqrt(3)) / 6,   0.0f,	// inner right
+		 0.0f,  -0.5f * float(sqrt(3)) / 3,   0.0f	// inner down
+	};
+
+	// ordering the indices of vertices[] so that we draw a nice thingy
+	GLuint indices[] =
+	{
+		0, 3, 5,
+		3, 2, 4,
+		5, 4, 1
 	};
 
 	// time to send stuff over from CPU to GPU - our triangle.
@@ -99,7 +117,7 @@ int notmain()
 	// but we need to send only 1 reference - to the program.
 	// (so this time the batch is not that big.)
 
-	GLuint VAO, VBO;	// ArrayObject, BufferObject
+	GLuint VAO, VBO, EBO;	// ArrayObject, BufferObject
 	// VAO stores pointers to one ore more VBO's
 	// we need VAO's to tell OpenGL about our VBO
 	// or change between VBO's
@@ -110,10 +128,12 @@ int notmain()
 	glGenVertexArrays(1, &VAO); // 1 object, point to VAO reff
 
 	// we now CREATE the buffer object
-	glGenBuffers(
-		1,		// we send 1 3D object.
-		&VBO	// point to the refference we created
-	);
+	glGenBuffers(1,	&VBO);
+	// we send 1 3D object. point to the refference we created
+
+	// Element Buffer Object 
+	glGenBuffers(1, &EBO);
+
 
 	// BINDING IN OpenGL
 	// we make a chosen, certain object
@@ -135,6 +155,9 @@ int notmain()
 	// DYNAMIC - modiefied multiple times, used MANY MANY times
 	// _DRAW - modified and used to draw an image
 
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
 	// configure VAO, so OpenGL knows how to read VBO, with...
 	glVertexAttribPointer(
 		0,						// position of Vertex Attribute
@@ -151,6 +174,7 @@ int notmain()
 	// to not accidently fuck them up.
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 
 	// !! the buffers we're talking about below
@@ -162,15 +186,15 @@ int notmain()
 	// then back is shown - becomes front and
 	// front becomes back and is rewritten
 
-	// prepare to clear a (back) buffer and give it a nice color
-	glClearColor(
-		0.07f, 0.13f, 0.17f,	// color - navy blue :)
-		1.0f					// opacity - 1 full opaque, 0 full transparent
-	);
-	// execute the command we prepared on a current (back) buffer
-	glClear(GL_COLOR_BUFFER_BIT);
-	// swap the buffers!
-	glfwSwapBuffers(window);
+	//// prepare to clear a (back) buffer and give it a nice color
+	//glClearColor(
+	//	0.07f, 0.13f, 0.17f,	// color - navy blue :)
+	//	1.0f					// opacity - 1 full opaque, 0 full transparent
+	//);
+	//// execute the command we prepared on a current (back) buffer
+	//glClear(GL_COLOR_BUFFER_BIT);
+	//// swap the buffers!
+	//glfwSwapBuffers(window);
 
 
 	// main while loop - where all rendering will happen
@@ -182,11 +206,12 @@ int notmain()
 		glClear(GL_COLOR_BUFFER_BIT);				// execute program on back buffer
 		glUseProgram(shaderProgram);
 		glBindVertexArray(VAO);		// we have only one VAO, but we need to get used to this
-		glDrawArrays(
-			GL_TRIANGLES,	// primitive to use
-			0,				// starting index of vertices
-			3				// # of vertices
-		);
+		//glDrawArrays(
+		//	GL_TRIANGLES,	// primitive to use
+		//	0,				// starting index of vertices
+		//	3				// # of vertices
+		//);
+		glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0); 
 		glfwSwapBuffers(window);
 
 		// we need to tell GLFW to process the events
@@ -198,6 +223,7 @@ int notmain()
 	// cleanup before closing
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
 	glDeleteProgram(shaderProgram);
 
 	glfwDestroyWindow(window);
