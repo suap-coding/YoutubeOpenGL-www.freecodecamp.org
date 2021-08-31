@@ -4,27 +4,9 @@
 #include <iostream>
 #include <glad/glad.h>	// library we use to allow the use of OpenGL
 #include <GLFW/glfw3.h>	// library we use to create window
+#include "shaders.h"
 
-// Vertex Shader source code
-// it prepares mathematicaly perfect triangle
-const char* vertexShaderSource =
-	"#version 330 core\n"
-	"layout (location = 0) in vec3 aPos;\n"
-	"void main()\n"
-	"{\n"
-	"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-	"}\0";
-
-// Fragment Shader source code
-// it pixelises the triangle
-const char* fragmentShaderSource = "#version 330 core\n"
-	"out vec4 FragColor;\n"
-	"void main()\n"
-	"{\n"
-	"   FragColor = vec4(0.8f, 0.3f, 0.02f, 1.0f);\n"
-	"}\n\0";
-
-int main()
+int notmain()
 {
 	glfwInit();
 
@@ -35,15 +17,6 @@ int main()
 	// below we chose the OpenGL Profile - core or compatibility
 	// and we load the set of functions of the chosen type
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-	// we make sure the float is actualy the size we need
-	// and we create a triangle as an array of floats
-	GLfloat vertices[] =
-	{
-		-0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f,
-		 0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f,
-		 0.0f,  0.5f * float(sqrt(3)) * 2 / 3 , 0.0f
-	};
 
 	// create a window (window object)
 	GLFWwindow* window = glfwCreateWindow(
@@ -100,14 +73,24 @@ int main()
 	glAttachShader(shaderProgram, fragmentShader);
 
 	// link the program we created to opengl? unsure.
+	// (preprocess->compile->link?)
 	glLinkProgram(shaderProgram);
 
 	// clear stuff
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 
+	
+	// to make sure we use the correct float we go with GLfloat
+	// and we create a triangle as an array of floats
+	GLfloat vertices[] =
+	{
+		-0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f,
+		 0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f,
+		 0.0f,  0.5f * float(sqrt(3)) * 2 / 3 , 0.0f
+	};
 
-	// time to send stuff over from CPU to GPU - the triangle.
+	// time to send stuff over from CPU to GPU - our triangle.
 	// it's a slow thing, so we need to send it in
 	// BIIIG BATCH, to do it once and be done with
 	// that's probably why we get the loading screens... :P

@@ -1,0 +1,50 @@
+// Prepare shaders source codes ////
+ 1 - Vertex Shader
+ 2 - Fragment Shader
+
+// GLFW ////
+ 1 - init GLFW - window thingy
+ 2 - tell it the version of OpenGL (hint) (context)
+ 3 - chose OpenGL Profile - Core or Compatibility
+ 4 - create a window
+ 4*- (optional) check if created successfully
+ 5 - make window current context
+
+// GLAD & OpenGL ////
+ 1 - load OpenGL functions (glad)
+ 2 - tell OpenGL where to render (OpenGL) (Viewport)
+
+// Shaders - Vertex and Fragment ////
+ 1 - reference values
+ 2 - connect reference values with sources
+ 3 - compile shaders
+ 4 - create shader program reference values
+ 5 - add (attach) shaders to the program
+ 6 - use linker - link program 
+ 7 - thrash unnecesary stuff
+
+// Create a thing to render ////
+ 1 - yes, just do it
+
+// Pass stuff to gpu ////
+ 1 - create Vertex Array Object reference value
+ 3 - bind vao
+ 2 - generate Vertex Array, pass the VAO ref value
+ 4 - create Vertex Buffer Object
+ 5 - bind vbo
+ 6 - pass data to buffer
+ 7 - glVertexAttribPointer
+  — define an array of generic vertex attribute data
+ 8 - enable that array
+ 9 - unbind VBO and VAO to prevent fuckups
+
+// RENDER STUFF FINALY FUCK YES ////
+ 1 - just... DO IT!
+ 2 - yes you can!
+ 3 - front and back buffer etc
+
+// FINISH HIM ////
+ 1 - delete everything that needs deletion before closing
+ 2 - destroy window
+ 3 - terminate glfw
+ 4 - return 0; // :)
